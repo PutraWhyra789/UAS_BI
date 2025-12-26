@@ -11,8 +11,8 @@ import s3fs
 import streamlit as st
 
 # --- KONFIGURASI API ---
-EXCHANGE_API_KEY = "ISI_KEY"
-STEAM_API_KEY = "ISI_KEY"
+EXCHANGE_API_KEY = "f2c149cc2695de347fe70f4e"
+STEAM_API_KEY = "A569C508E5EACCAC4323D59FF860861B"
 
 # --- KONFIGURASI UI ---
 st.set_page_config(page_title="Smart Game Planner", layout="wide")
@@ -147,6 +147,7 @@ def run_pipeline(steam_id):
         SELECT
             m.title,
             m.salePrice,
+            m.normalPrice, -- [BARU] Ambil harga asli
             m.cheapestPrice,
             m.savings,
             m.dealRating,
@@ -162,6 +163,7 @@ def run_pipeline(steam_id):
     final_calc AS (
         SELECT
             title as Game,
+            (CAST(normalPrice AS FLOAT) * rate) as Harga_Asli_IDR, -- [BARU] Hitung Harga Asli Rupiah
             (CAST(salePrice AS FLOAT) * rate) as Harga_IDR,
             (CAST(cheapestPrice AS FLOAT) * rate) as Lowest_IDR,
             CAST(savings AS FLOAT) as Diskon_Persen,
@@ -204,10 +206,13 @@ with st.sidebar:
     user_steam_id = st.text_input("SteamID64", help="765611980XXXXXXXX")
 
     st.info("""
-    **Rekomendasi:**
-    - 💎 **ALL TIME LOW**: Harga saat ini adalah harga termurah yang pernah tercatat dalam sejarah! (Wajib Beli).
-    - ✅ **GAS BELI**: Skor bagus, tapi bukan harga terendah sejarah.
-    - ⏳ **NABUNG**: Budget belum cukup.
+    **Legenda Keputusan Preskriptif:**
+    - 💎 **ALL TIME LOW**: Harga termurah dalam sejarah (Wajib Beli).
+    - ✅ **GAS BELI**: Skor deal bagus (>75), worth it.
+    - ⚠️ **PIKIR DULU**: Skor deal rata-rata (50-75).
+    - ⏳ **NABUNG DULU**: Budget tabungan belum cukup.
+    - ⛔ **SKIP**: Deal buruk atau game kurang bagus.
+    - ❌ **SUDAH PUNYA**: Terdeteksi di Steam Library.
     """)
 
 if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
@@ -250,16 +255,19 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                 result.style.applymap(color_coding, subset=["Rekomendasi_AI"]),
                 column_config={
                     "Game": st.column_config.TextColumn("Judul Game"),
-                    "Harga_IDR": st.column_config.NumberColumn(
-                        "Harga Sekarang", format="Rp %d"
-                    ),
-                    "Lowest_IDR": st.column_config.NumberColumn(
-                        "Harga Termurah (Pernah Ada)",
-                        format="Rp %d",
-                        help="Harga termurah yang pernah tercatat dalam sejarah.",
+                    "Harga_Asli_IDR": st.column_config.NumberColumn(
+                        "Harga Asli", format="Rp %d"
                     ),
                     "Diskon_Persen": st.column_config.ProgressColumn(
                         "Diskon", format="%.0f%%", min_value=0, max_value=100
+                    ),
+                    "Harga_IDR": st.column_config.NumberColumn(
+                        "Harga Setelah Diskon", format="Rp %d"
+                    ),
+                    "Lowest_IDR": st.column_config.NumberColumn(
+                        "Harga Terendah (Histori)",
+                        format="Rp %d",
+                        help="Harga termurah yang pernah tercatat dalam sejarah.",
                     ),
                     "Score_Quality": st.column_config.NumberColumn(
                         "Metacritic", format="%d"
@@ -267,6 +275,7 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                     "Rekomendasi_AI": st.column_config.TextColumn(
                         "Keputusan Preskriptif"
                     ),
+                    # Sembunyikan kolom teknis
                     "Skor_Akhir": None,
                     "Budget_User": None,
                 },
