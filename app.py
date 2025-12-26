@@ -211,8 +211,8 @@ with st.sidebar:
     st.info("""
     **Legenda Keputusan Preskriptif:**
     - 💎 **ALL TIME LOW**: Harga termurah dalam sejarah (Wajib Beli).
-    - ✅ **GAS BELI**: Skor deal bagus (>75), worth it.
-    - ⚠️ **PIKIR DULU**: Skor deal rata-rata (50-75).
+    - ✅ **GAS BELI**: Total skor bagus (>75), worth it.
+    - ⚠️ **PIKIR DULU**: Total skor rata-rata (50-75).
     - ⏳ **NABUNG DULU**: Budget tabungan belum cukup.
     - ⛔ **SKIP**: Deal buruk atau game kurang bagus.
     - ❌ **SUDAH PUNYA**: Terdeteksi di Steam Library.
@@ -265,26 +265,31 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                         "Diskon", format="%.0f%%", min_value=0, max_value=100
                     ),
                     "Harga_IDR": st.column_config.NumberColumn(
-                        "Harga Setelah Diskon", format="Rp %d"
+                        "Harga Saat Ini", format="Rp %d"
                     ),
                     "Lowest_IDR": st.column_config.NumberColumn(
-                        "Harga Terendah (Histori)",
+                        "Lowest Price (Histori)",
                         format="Rp %d",
-                        help="Harga termurah yang pernah tercatat dalam sejarah.",
                     ),
                     "Score_Quality": st.column_config.NumberColumn(
                         "Metacritic", format="%d"
                     ),
                     "Skor_Deal": st.column_config.NumberColumn(
                         "Deal Rating", 
-                        format="%.1f / 10", 
-                        help="Skor kualitas diskon dari CheapShark (0-10)"
+                        format="%.1f / 10",
                     ),
+                    
+                    "Skor_Akhir": st.column_config.ProgressColumn(
+                        "Total Skor AI",
+                        format="%.1f",
+                        min_value=0,
+                        max_value=100,
+                        help="Gabungan: Diskon (40%) + Deal Rating (30%) + Metacritic (30%)"
+                    ),
+                    
                     "Rekomendasi_AI": st.column_config.TextColumn(
                         "Keputusan Preskriptif"
                     ),
-                    # Sembunyikan kolom teknis
-                    "Skor_Akhir": None,
                     "Budget_User": None,
                 },
                 use_container_width=True,
