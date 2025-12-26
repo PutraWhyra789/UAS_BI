@@ -10,9 +10,11 @@ import requests
 import s3fs
 import streamlit as st
 
+from API_KEY import MY_EXCHANGE_API_KEY, MY_STEAM_API_KEY
+
 # --- KONFIGURASI API ---
-EXCHANGE_API_KEY = "f2c149cc2695de347fe70f4e"
-STEAM_API_KEY = "A569C508E5EACCAC4323D59FF860861B"
+EXCHANGE_API_KEY = MY_EXCHANGE_API_KEY
+STEAM_API_KEY = MY_STEAM_API_KEY
 
 # --- KONFIGURASI UI ---
 st.set_page_config(page_title="Smart Game Planner", layout="wide")
@@ -167,6 +169,7 @@ def run_pipeline(steam_id):
             (CAST(salePrice AS FLOAT) * rate) as Harga_IDR,
             (CAST(cheapestPrice AS FLOAT) * rate) as Lowest_IDR,
             CAST(savings AS FLOAT) as Diskon_Persen,
+            CAST(dealRating AS FLOAT) as Skor_Deal,
             CAST(metacriticScore AS FLOAT) as Score_Quality,
             ((CAST(savings AS FLOAT) * 0.4) + ((CAST(dealRating AS FLOAT) * 10) * 0.3) + (CAST(metacriticScore AS FLOAT) * 0.3)) as Skor_Akhir,
             budget as Budget_User,
@@ -271,6 +274,11 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                     ),
                     "Score_Quality": st.column_config.NumberColumn(
                         "Metacritic", format="%d"
+                    ),
+                    "Skor_Deal": st.column_config.NumberColumn(
+                        "Deal Rating", 
+                        format="%.1f / 10", 
+                        help="Skor kualitas diskon dari CheapShark (0-10)"
                     ),
                     "Rekomendasi_AI": st.column_config.TextColumn(
                         "Keputusan Preskriptif"
