@@ -9,3 +9,4 @@ wheels/
 # Virtual environments
 .venv
 API_KEY.py
+library.db
