@@ -5,7 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "beautifulsoup4>=4.14.3",
     "duckdb>=1.4.3",
     "minio>=7.2.20",
     "openpyxl>=3.1.5",
