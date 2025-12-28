@@ -76,13 +76,16 @@ def run_pipeline(steam_id):
     # 3. KURS
     status_box.write("💱 [3/5] Update Kurs Dollar...")
     try:
-        url_kurs = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_API_KEY}/latest/USD"
+        # --- PERUBAHAN: Menggunakan Endpoint PAIR (Lebih Efisien) ---
+        url_kurs = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_API_KEY}/pair/USD/IDR"
         res_kurs = requests.get(url_kurs).json()
-        rate_idr = res_kurs["conversion_rates"]["IDR"]
+        rate_idr = res_kurs["conversion_rate"]
+
         pd.DataFrame([{"rate": rate_idr}]).to_csv(
             "s3://lakehouse/bronze/kurs.csv", index=False, storage_options=MINIO_CONF
         )
-    except:
+    except Exception as e:
+        print(f"Error Kurs: {e}")
         rate_idr = 16000.0
 
     # 4. MARKET (DEALS + LOWEST PRICE CHECK)
