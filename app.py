@@ -93,7 +93,7 @@ def run_pipeline(steam_id):
 
     # A. Ambil Deals
     deals = requests.get(
-        "https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=50"
+        "https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=50&pageSize=30"
     ).json()
     df_market = pd.DataFrame(deals)
 
@@ -255,7 +255,9 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                 elif "PIKIR" in val:
                     return "background-color: #fff3cd; color: #664d03"
                 elif "SUDAH" in val:
-                    return "background-color: #d3d3d3; color: #555555; font-style: italic;"
+                    return (
+                        "background-color: #d3d3d3; color: #555555; font-style: italic;"
+                    )
                 return ""
 
             # Tampilan Dataframe
@@ -283,7 +285,6 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                         "Deal Rating",
                         format="%.1f / 10",
                     ),
-                    
                     "Skor_Akhir": st.column_config.NumberColumn(
                         "Total Skor AI",
                         format="%.1f",
