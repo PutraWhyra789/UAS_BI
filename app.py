@@ -251,6 +251,8 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                     return "background-color: #f8d7da; color: #842029"
                 elif "PIKIR" in val:
                     return "background-color: #fff3cd; color: #664d03"
+                elif "SUDAH" in val:
+                    return "background-color: #d3d3d3; color: #555555; font-style: italic;"
                 return ""
 
             # Tampilan Dataframe
@@ -279,7 +281,7 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                         format="%.1f / 10",
                     ),
                     
-                    "Skor_Akhir": st.column_config.ProgressColumn(
+                    "Skor_Akhir": st.column_config.NumberColumn(
                         "Total Skor AI",
                         format="%.1f",
                         min_value=0,
