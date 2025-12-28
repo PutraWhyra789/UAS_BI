@@ -52,7 +52,7 @@ def get_steam_library(steam_id):
         return pd.DataFrame(columns=["game_title"])
 
 
-# --- PIPELINE ETL ---
+# --- PIPELINE ELT ---
 def run_pipeline(steam_id):
     status_box = st.status("🚀 Menjalankan Pipeline Analisis...", expanded=True)
 
