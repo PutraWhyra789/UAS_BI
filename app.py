@@ -76,13 +76,16 @@ def run_pipeline(steam_id):
     # 3. KURS
     status_box.write("💱 [3/5] Update Kurs Dollar...")
     try:
-        url_kurs = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_API_KEY}/latest/USD"
+        # --- PERUBAHAN: Menggunakan Endpoint PAIR (Lebih Efisien) ---
+        url_kurs = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_API_KEY}/pair/USD/IDR"
         res_kurs = requests.get(url_kurs).json()
-        rate_idr = res_kurs["conversion_rates"]["IDR"]
+        rate_idr = res_kurs["conversion_rate"]
+
         pd.DataFrame([{"rate": rate_idr}]).to_csv(
             "s3://lakehouse/bronze/kurs.csv", index=False, storage_options=MINIO_CONF
         )
-    except:
+    except Exception as e:
+        print(f"Error Kurs: {e}")
         rate_idr = 16000.0
 
     # 4. MARKET (DEALS + LOWEST PRICE CHECK)
@@ -90,7 +93,7 @@ def run_pipeline(steam_id):
 
     # A. Ambil Deals
     deals = requests.get(
-        "https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=50&pageSize=20"
+        "https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=50"
     ).json()
     df_market = pd.DataFrame(deals)
 
@@ -277,7 +280,7 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                         "Metacritic", format="%d"
                     ),
                     "Skor_Deal": st.column_config.NumberColumn(
-                        "Deal Rating", 
+                        "Deal Rating",
                         format="%.1f / 10",
                     ),
                     
@@ -286,9 +289,8 @@ if st.button("🧠 Cek Harga Terendah & Rekomendasi", type="primary"):
                         format="%.1f",
                         min_value=0,
                         max_value=100,
-                        help="Gabungan: Diskon (40%) + Deal Rating (30%) + Metacritic (30%)"
+                        help="Gabungan: Diskon (40%) + Deal Rating (30%) + Metacritic (30%)",
                     ),
-                    
                     "Rekomendasi_AI": st.column_config.TextColumn(
                         "Keputusan Preskriptif"
                     ),
