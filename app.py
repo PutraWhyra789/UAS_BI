@@ -76,7 +76,6 @@ def run_pipeline(steam_id):
     # 3. KURS
     status_box.write("💱 [3/5] Update Kurs Dollar...")
     try:
-        # --- PERUBAHAN: Menggunakan Endpoint PAIR (Lebih Efisien) ---
         url_kurs = f"https://v6.exchangerate-api.com/v6/{EXCHANGE_API_KEY}/pair/USD/IDR"
         res_kurs = requests.get(url_kurs).json()
         rate_idr = res_kurs["conversion_rate"]
@@ -135,7 +134,6 @@ def run_pipeline(steam_id):
         f"SET s3_endpoint='localhost:9000'; SET s3_access_key_id='minioadmin'; SET s3_secret_access_key='minioadmin'; SET s3_use_ssl=false; SET s3_url_style='path';"
     )
 
-    # --- PERBAIKAN QUERY (Menggunakan CTE 'final_calc') ---
     query = f"""
     WITH
     rate AS (SELECT rate FROM read_csv('s3://lakehouse/bronze/kurs.csv', header=True) LIMIT 1),
